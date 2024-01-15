@@ -9,13 +9,11 @@ class Program{
 
         int userInput;
 
-        do
-        {
+        do{
             Console.Write("Enter number: ");
             userInput = Convert.ToInt32(Console.ReadLine());
 
-            if (userInput != 0)
-            {
+            if (userInput != 0){
                 numbers.Add(userInput);
             }
 
@@ -36,3 +34,5 @@ class Program{
         Console.WriteLine($"The largest number is: {maxNumber}");
     }
 }
+
+//Code by Nicolas Velasquez

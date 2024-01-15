@@ -9,22 +9,18 @@ class Program{
         // Step 2: Ask the user for a guess
         int userGuess;
 
-        do
-        {
+        do{
             Console.Write("What is your guess? ");
             userGuess = Convert.ToInt32(Console.ReadLine());
 
             // Step 3: Determine if the user needs to guess higher, lower, or if they guessed it
-            if (userGuess < magicNumber)
-            {
+            if (userGuess < magicNumber){
                 Console.WriteLine("Higher");
             }
-            else if (userGuess > magicNumber)
-            {
+            else if (userGuess > magicNumber){
                 Console.WriteLine("Lower");
             }
-            else
-            {
+            else{
                 Console.WriteLine("You guessed it!");
             }
         } while (userGuess != magicNumber);
@@ -32,3 +28,5 @@ class Program{
         Console.WriteLine("Game Over!");
     }
 }
+
+//Code by Nicolas Velasquez

@@ -9,24 +9,19 @@ class Program{
         // Step 2: Determine the letter grade using if-elif-else statements
         char letter;
 
-        if (gradePercentage >= 90)
-        {
+        if (gradePercentage >= 90){
             letter = 'A';
         }
-        else if (gradePercentage >= 80)
-        {
+        else if (gradePercentage >= 80){
             letter = 'B';
         }
-        else if (gradePercentage >= 70)
-        {
+        else if (gradePercentage >= 70){
             letter = 'C';
         }
-        else if (gradePercentage >= 60)
-        {
+        else if (gradePercentage >= 60){
             letter = 'D';
         }
-        else
-        {
+        else{
             letter = 'F';
         }
 
@@ -34,13 +29,13 @@ class Program{
         Console.WriteLine($"Your letter grade is: {letter}");
 
         // Step 4: Check if the user passed the course and display a message
-        if (gradePercentage >= 70)
-        {
+        if (gradePercentage >= 70){
             Console.WriteLine("Congratulations! You passed the course.");
         }
-        else
-        {
+        else{
             Console.WriteLine("Keep it up! You can improve next time.");
         }
     }
 }
+
+//Code by Nicolas Velasquez
