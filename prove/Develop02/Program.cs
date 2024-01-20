@@ -73,7 +73,11 @@ class PrompGenerator{
         "What was the strongest emotion I felt today?",
         "If I had one thing I could do over today, what would it be?",
         "What did you do for fun today?",
-        "What can you do better tomorrow?"
+        "What can you do better tomorrow?",
+        "What did you accomplish today?",
+        "What was the most challenging part of your day?",
+        "What can you improve upon in the future?",
+        "How did you overcome any obstacles today?",
     };
 
     public string GetRandomPrompt(){
