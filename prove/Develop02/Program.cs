@@ -21,6 +21,7 @@ class Entry{
         Console.WriteLine($"Entry: {_entryText}");
     }
 
+    //Create a format for file with specific parameters
     public string FormatForFile(){
         return $"{_date}~|~{_prompText}~|~{_entryText}";
         
@@ -80,6 +81,7 @@ class PrompGenerator{
         "How did you overcome any obstacles today?",
     };
 
+    //Show a random prompt for the user
     public string GetRandomPrompt(){
         Random random = new Random();
         int index = random.Next(_prompts.Count);
