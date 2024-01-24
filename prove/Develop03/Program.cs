@@ -4,7 +4,8 @@ using System.Linq;
 
 class Program{
     static void Main(){
-        // Example usage
+        
+        // There is the scripture
         Reference reference = new Reference("John", 3, 16);
         Scripture scripture = new Scripture(reference, "Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths.");
         
@@ -17,14 +18,12 @@ class Program{
             
             if (userInput.ToLower() == "quit")
                 break;
-                
-            // You may want to add error handling for invalid user input
             
-            int numberOfWordsToHide = 2; // Adjust this based on your preference
+            int numberOfWordsToHide = 2; // Here we hide 2 words for time
             scripture.HideRandomWords(numberOfWordsToHide);
         }
         
-        Console.WriteLine("Goodbye!");
+        Console.WriteLine("Goodbye! Thanks for learn!");
     }
 }
 
@@ -48,7 +47,7 @@ class Scripture{
                 _words[randomIndex].Hide();
             }
             else{
-                // If the selected word is already hidden, decrement the loop counter to try again
+                // If the selected word is already hidden, decrement the loop counter for find other not hidden
                 i--;
             }
         }
@@ -113,3 +112,5 @@ class Reference{
         return $"{_book} {_chapter}:{_verse}-{_endVerse}";
     }
 }
+
+//Code by Nicolas Velasquez©
