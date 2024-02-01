@@ -18,13 +18,15 @@ class Activity{
         Console.WriteLine($"Duration: {_duration} seconds\n");
         Console.WriteLine(_description);
         Console.WriteLine("Prepare to begin...");
-        ShowSpinner(3); // Pause before starting
+        ShowSpinner(3); 
+        // Pause before starting
     }
 
     protected void DisplayEndingMessage(){
         Console.WriteLine($"Great job! You've completed the {_name}.");
         Console.WriteLine($"Total time: {_duration} seconds");
-        ShowSpinner(3); // Pause before finishing
+        ShowSpinner(3); 
+        // Pause before finishing
     }
 
     protected void ShowSpinner(int seconds){
@@ -86,7 +88,8 @@ class ListingActivity : Activity{
         Console.WriteLine(randomPrompt);
 
         Console.WriteLine("Get ready to list as many items as you can...");
-        ShowCountDown(5); // Pause before listing
+        ShowCountDown(5); 
+        // Pause before listing
 
         GetListFromUser();
 
@@ -220,3 +223,5 @@ class Program{
         activity.Run();
     }
 }
+
+//Code by Nicolas Velasquez
