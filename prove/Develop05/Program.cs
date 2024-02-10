@@ -290,6 +290,7 @@ class Program{
         goalManager.Start();
     }
 }
-
+//When you ask for record your goals, remeber that the first goal start in "0", this is the first.
 
 //Code by Nicolas Velasquez©
+
