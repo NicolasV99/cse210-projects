@@ -1,0 +1,5 @@
+ISBN,Title,Author,Genre,IsAvailable
+001,Harry Potter and the Sorcerer's Stone,J.K. Rowling,Fantasy,true
+002,To Kill a Mockingbird,Harper Lee,Fiction,true
+003,1984,George Orwell,Science Fiction,true
+

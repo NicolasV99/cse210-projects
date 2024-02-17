@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 
 public class Book{
@@ -185,6 +186,40 @@ public class Catalog{
             return false; // Book already available
         }
     }
+
+    public void LoadBooksFromTextFile(string filePath)
+    {
+        try
+        {
+            using (StreamReader sr = new StreamReader(filePath))
+            {
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    string[] parts = line.Split(','); // Adjust delimiter as needed
+                    if (parts.Length == 5)
+                    {
+                        string isbn = parts[0].Trim();
+                        string title = parts[1].Trim();
+                        string author = parts[2].Trim();
+                        string genre = parts[3].Trim();
+                        bool isAvailable = bool.Parse(parts[4].Trim());
+                        Book book = new Book(isbn, title, author, genre, isAvailable);
+                        books.Add(book);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Invalid line in file: {line}");
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading books from file: {ex.Message}");
+        }
+    }
+
 }
 
 
@@ -193,11 +228,8 @@ class Program{
     static void Main(){
         // Create a new library catalog
         Catalog catalog = new Catalog();
+        catalog.LoadBooksFromTextFile("books.txt");
 
-        // Load books from CSV file
-        LoadBooksFromCSV("books.csv", catalog);
-
-        
         // Sample patrons
         Patron patron1 = new Patron("John Doe");
         Patron patron2 = new Patron("Jane Smith");
