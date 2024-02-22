@@ -385,6 +385,37 @@ class Program{
         return new Patron(name, new LibraryCard(111, null)); // Using a fictitious library card number
         //Please when you check out for a book, this would be the patron's name (111)
     }
-
-
 }
+
+//Code by Nicolas Belasquez©
+
+
+/*There is some instructions for use the program:
+ 
+-Options:
+Choose an option by entering the corresponding number and pressing Enter.
+
+-Search for a Book:
+Enter the ISBN of the book you want to search for. The program will display details if the book is found.
+
+-Add a Book:
+Enter the details (ISBN, Title, Author, Genre) of the book you want to add. The book will be added to the library's collection.
+
+-Remove a Book:
+Enter the ISBN of the book you want to remove. If the book is found, it will be removed from the library's collection.
+
+-List all Books:
+Displays details of all books available in the library.
+
+-Check Out a Book:
+Enter the ISBN of the book you want to check out and the name of the patron checking it out. The program will attempt to check out the book.
+
+-Return a Book:
+Enter the ISBN of the book being returned and the name of the patron returning it. The program will attempt to return the book to the library.
+
+-List Checked Out Books:
+Displays details of all books currently checked out from the library.
+
+-List Overdue Loans:
+Displays details of all loans that are currently overdue. 
+*/
