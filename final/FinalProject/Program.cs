@@ -1,218 +1,217 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 
-
-public class Book{
-    public string ISBN { get; set; }
-    public string Title { get; set; }
-    public string Author { get; set; }
-    public string Genre { get; set; }
+// Book class
+public class Book
+{
+    public string ISBN { get; }
+    public string Title { get; }
+    public string Author { get; }
+    public string Genre { get; }
     public bool IsAvailable { get; set; }
 
-    public Book(string isbn, string title, string author, string genre, bool isAvailable){
+    public Book(string isbn, string title, string author, string genre)
+    {
         ISBN = isbn;
         Title = title;
         Author = author;
         Genre = genre;
-        IsAvailable = isAvailable;
+        IsAvailable = true;
     }
 
-    public string GetDetails(){
-        return $"Title: {Title}\nAuthor: {Author}\nGenre: {Genre}\nISBN: {ISBN}\nAvailable: {IsAvailable}";
+    public string GetDetails()
+    {
+        return $"ISBN: {ISBN}, Title: {Title}, Author: {Author}, Genre: {Genre}, Available: {(IsAvailable ? "Yes" : "No")}";
     }
 }
 
-public class Library{
+// Library class
+public class Library
+{
     private List<Book> books;
 
-    public Library(){
+    public Library()
+    {
         books = new List<Book>();
     }
 
-    public void AddBook(Book book){
+    public void AddBook(Book book)
+    {
         books.Add(book);
     }
 
-    public void RemoveBook(Book book){
+    public void RemoveBook(Book book)
+    {
         books.Remove(book);
     }
 
-    public Book SearchBook(string isbn){
-        return books.Find(book => book.ISBN == isbn);
+    public Book SearchBook(string isbn)
+    {
+        return books.FirstOrDefault(book => book.ISBN == isbn);
     }
 
-    public void ListBooks(){
-        if (books.Count > 0){
-            foreach (var book in books){
-                Console.WriteLine(book.GetDetails());
-                Console.WriteLine("-----------------------");
-            }
-        }
-        else{
-            Console.WriteLine("No books available in the library.");
+    public void ListBooks()
+    {
+        foreach (var book in books)
+        {
+            Console.WriteLine(book.GetDetails());
         }
     }
 
-    public void CheckoutBook(Book book, Patron patron){
-        if (books.Contains(book) && book.IsAvailable){
-            book.IsAvailable = false;
-            Console.WriteLine($"Book '{book.Title}' checked out to {patron.Name}.");
-        }
-        else{
-            Console.WriteLine("Book is not available for checkout.");
-        }
-    }
-
-    public void ReturnBook(Book book){
-        if (books.Contains(book)){
-            book.IsAvailable = true;
-            Console.WriteLine($"Book '{book.Title}' returned successfully.");
-        }
-        else{
-            Console.WriteLine("Book not found in the library.");
-        }
-    }
+    // Other methods such as checkout, return, etc. can be added here
 }
 
-public class Patron{
-    private List<Book> checkedOutBooks;
-    public string Name { get; private set; }
+// Patron class
+public class Patron
+{
+    public string Name { get; }
+    public LibraryCard LibraryCard { get; }
 
-    public Patron(string name){
+    public Patron(string name, LibraryCard libraryCard)
+    {
         Name = name;
-        checkedOutBooks = new List<Book>();
+        LibraryCard = libraryCard;
     }
 
-    public void CheckOutBook(Book book){
-        checkedOutBooks.Add(book);
-    }
-
-    public void ReturnBook(Book book){
-        checkedOutBooks.Remove(book);
-    }
-
-    public List<Book> GetCheckedOutBooks(){
-        return checkedOutBooks;
-    }
+    // Additional methods can be added here
 }
 
-public class LibraryCard{
-    public string CardNumber { get; set; }
-    public Patron Patron { get; set; }
+// LibraryCard class
+public class LibraryCard
+{
+    public int CardNumber { get; }
+    public Patron Patron { get; }
 
-    public LibraryCard(string cardNumber, Patron patron){
+    public LibraryCard(int cardNumber, Patron patron)
+    {
         CardNumber = cardNumber;
         Patron = patron;
     }
 }
 
-public class Loan{
-    public Book Book { get; set; }
-    public Patron Patron { get; set; }
-    public DateTime DueDate { get; set; }
+// Loan class
+public class Loan
+{
+    public Book Book { get; }
+    public Patron Patron { get; }
+    public DateTime DueDate { get; }
 
-    public Loan(Book book, Patron patron, DateTime dueDate){
+    public Loan(Book book, Patron patron, DateTime dueDate)
+    {
         Book = book;
         Patron = patron;
         DueDate = dueDate;
     }
+
+    // Additional methods can be added here
 }
 
-public class Catalog{
+// Catalog class
+public class Catalog
+{
     private List<Book> books;
 
-    public Catalog(){
+    public Catalog()
+    {
         books = new List<Book>();
     }
 
-    public void AddBook(Book book){
+    public void AddBook(Book book)
+    {
         books.Add(book);
     }
 
-    public void RemoveBook(Book book){
+    public void RemoveBook(Book book)
+    {
         books.Remove(book);
     }
 
-    public void DisplayCatalog()
+    public Book SearchBook(string title)
     {
-        Console.WriteLine("Catalog:");
-        foreach (var book in books){
-            Console.WriteLine(book);
+        return books.FirstOrDefault(book => book.Title == title);
+    }
+
+    public void ListBooks()
+    {
+        foreach (var book in books)
+        {
+            Console.WriteLine(book.GetDetails());
         }
     }
+}
 
-    public List<Book> SearchByTitle(string title){
-        return books.Where(b => b.Title.Contains(title, StringComparison.OrdinalIgnoreCase)).ToList();
-    }
+class Program{
+    static Library library = new Library(); // Initialize a library object
 
-    public List<Book> SearchByAuthor(string author){
-        return books.Where(b => b.Author.Contains(author, StringComparison.OrdinalIgnoreCase)).ToList();
-    }
+    static void Main(string[] args){
+        // Load books from the text file
+        LoadBooksFromFile("books.txt");
 
-    public List<Book> SearchByGenre(string genre){
-        return books.Where(b => b.Genre.Equals(genre, StringComparison.OrdinalIgnoreCase)).ToList();
-    }
+        bool exit = false;
+        while (!exit)
+        {
+            DisplayMenu();
+            int choice = GetMenuChoice();
 
-    public List<Book> GetAllBooks(){
-        return books;
-    }
-    public Book FindBookByISBN(string isbn){
-        foreach (var book in books){
-            if (book.ISBN == isbn){
-                return book;
+            switch (choice)
+            {
+                case 1:
+                    SearchForBook();
+                    break;
+                case 2:
+                    AddBook();
+                    break;
+                case 3:
+                    RemoveBook();
+                    break;
+                case 4:
+                    ListAllBooks();
+                    break;
+                case 5:
+                    // Implement Check Out a Book functionality
+                    break;
+                case 6:
+                    // Implement Return a Book functionality
+                    break;
+                case 7:
+                    // Implement List Checked Out Books functionality
+                    break;
+                case 8:
+                    // Implement List Overdue Loans functionality
+                    break;
+                case 9:
+                    exit = true;
+                    Console.WriteLine("Exiting the program. Goodbye!");
+                    break;
+                default:
+                    Console.WriteLine("Invalid choice. Please try again.");
+                    break;
             }
         }
-        return null; // Book not found
     }
 
-    public bool CheckOutBook(Book book){
-        if (book.IsAvailable){
-            book.IsAvailable = false;
-            return true; // Book checked out successfully
-        }
-        else{
-            return false; // Book already checked out
-        }
-    }
-
-    public bool ReturnBook(Book book){
-        if (!book.IsAvailable){
-            book.IsAvailable = true;
-            return true; // Book returned successfully
-        }
-        else{
-            return false; // Book already available
-        }
-    }
-
-    public void LoadBooksFromTextFile(string filePath)
+    static void LoadBooksFromFile(string filename)
     {
         try
         {
-            using (StreamReader sr = new StreamReader(filePath))
+            using (StreamReader sr = new StreamReader(filename))
             {
                 string line;
                 while ((line = sr.ReadLine()) != null)
                 {
-                    string[] parts = line.Split(','); // Adjust delimiter as needed
-                    if (parts.Length == 5)
-                    {
-                        string isbn = parts[0].Trim();
-                        string title = parts[1].Trim();
-                        string author = parts[2].Trim();
-                        string genre = parts[3].Trim();
-                        bool isAvailable = bool.Parse(parts[4].Trim());
-                        Book book = new Book(isbn, title, author, genre, isAvailable);
-                        books.Add(book);
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Invalid line in file: {line}");
-                    }
+                    string[] bookInfo = line.Split(',');
+                    string isbn = bookInfo[0].Trim();
+                    string title = bookInfo[1].Trim();
+                    string author = bookInfo[2].Trim();
+                    string genre = bookInfo[3].Trim();
+
+                    Book newBook = new Book(isbn, title, author, genre);
+                    library.AddBook(newBook);
                 }
             }
+            Console.WriteLine("Books loaded successfully.");
         }
         catch (Exception ex)
         {
@@ -220,121 +219,90 @@ public class Catalog{
         }
     }
 
+    static void DisplayMenu(){
+        Console.WriteLine("\nWelcome to the Library System");
+        Console.WriteLine("1. Search for a Book");
+        Console.WriteLine("2. Add a Book");
+        Console.WriteLine("3. Remove a Book");
+        Console.WriteLine("4. List all Books");
+        Console.WriteLine("5. Check Out a Book");
+        Console.WriteLine("6. Return a Book");
+        Console.WriteLine("7. List Checked Out Books");
+        Console.WriteLine("8. List Overdue Loans");
+        Console.WriteLine("9. Exit");
+        Console.Write("\nPlease enter your choice: ");
+        }
+
+        static int GetMenuChoice(){
+        int choice;
+        while (!int.TryParse(Console.ReadLine(), out choice))
+        {
+            Console.Write("Invalid input. Please enter a number: ");
+        }
+        return choice;
+        }
+
+        static void SearchForBook()
+        {
+        Console.Write("Enter ISBN of the book to search: ");
+        string isbn = Console.ReadLine();
+        Book foundBook = library.SearchBook(isbn);
+        if (foundBook != null)
+        {
+            Console.WriteLine("Book found:");
+            Console.WriteLine(foundBook.GetDetails());
+        }
+        else
+        {
+            Console.WriteLine("Book not found.");
+        }
+        }
+
+        static void AddBook()
+        {
+        Console.WriteLine("Enter book details:");
+        Console.Write("ISBN: ");
+        string isbn = Console.ReadLine();
+        Console.Write("Title: ");
+        string title = Console.ReadLine();
+        Console.Write("Author: ");
+        string author = Console.ReadLine();
+        Console.Write("Genre: ");
+        string genre = Console.ReadLine();
+
+        Book newBook = new Book(isbn, title, author, genre);
+        library.AddBook(newBook);
+        Console.WriteLine("Book added successfully.");
+        }
+
+        static void RemoveBook()
+        {
+        Console.Write("Enter ISBN of the book to remove: ");
+        string isbn = Console.ReadLine();
+        Book foundBook = library.SearchBook(isbn);
+        if (foundBook != null)
+        {
+            library.RemoveBook(foundBook);
+            Console.WriteLine("Book removed successfully.");
+        }
+        else
+        {
+            Console.WriteLine("Book not found.");
+        }
+        }
+
+        static void ListAllBooks()
+        {
+        Console.WriteLine("Listing all books:");
+        library.ListBooks();
+        }
+
+        static void InitializeLibraryWithSampleData()
+        {
+        // Add sample books to the library for testing
+        Book book1 = new Book("1234567890", "The Great Gatsby", "F. Scott Fitzgerald", "Classic");
+        Book book2 = new Book("0987654321", "To Kill a Mockingbird", "Harper Lee", "Fiction");
+        library.AddBook(book1);
+        library.AddBook(book2);
+        }
 }
-
-
-
-class Program{
-    static void Main(){
-        // Create a new library catalog
-        Catalog catalog = new Catalog();
-        catalog.LoadBooksFromTextFile("books.txt");
-
-        // Sample patrons
-        Patron patron1 = new Patron("John Doe");
-        Patron patron2 = new Patron("Jane Smith");
-
-        // Main menu loop
-        while (true){
-            Console.Clear();
-            Console.WriteLine("Library Management System");
-            Console.WriteLine("1. View Catalog");
-            Console.WriteLine("2. Check Out Book");
-            Console.WriteLine("3. Return Book");
-            Console.WriteLine("4. View Patron's Checked Out Books");
-            Console.WriteLine("5. Exit");
-            Console.Write("Enter your choice: ");
-
-            if (int.TryParse(Console.ReadLine(), out int choice)){
-                switch (choice){
-                    case 1:
-                        Console.Clear();
-                        Console.WriteLine("Catalog:");
-                        catalog.DisplayCatalog();
-                        break;
-
-                    case 2:
-                        Console.Clear();
-                        Console.WriteLine("Check Out Book:");
-                        Console.Write("Enter book ISBN: ");
-                        string isbn = Console.ReadLine();
-                        Book bookToCheckOut = catalog.FindBookByISBN(isbn);
-                        if (bookToCheckOut != null){
-                            catalog.CheckOutBook(bookToCheckOut);
-                            patron1.CheckOutBook(bookToCheckOut);
-                            Console.WriteLine("Book checked out successfully.");
-                        }
-                        else{
-                            Console.WriteLine("Book not found.");
-                        }
-                        break;
-
-                    case 3:
-                        Console.Clear();
-                        Console.WriteLine("Return Book:");
-                        Console.Write("Enter book ISBN: ");
-                        isbn = Console.ReadLine();
-                        Book bookToReturn = catalog.FindBookByISBN(isbn);
-                        if (bookToReturn != null){
-                            catalog.ReturnBook(bookToReturn);
-                            patron1.ReturnBook(bookToReturn);
-                            Console.WriteLine("Book returned successfully.");
-                        }
-                        else{
-                            Console.WriteLine("Book not found.");
-                        }
-                        break;
-
-                    case 4:
-                        Console.Clear();
-                        Console.WriteLine($"Books checked out by {patron1.Name}:");
-                        foreach (var book in patron1.GetCheckedOutBooks()){
-                            Console.WriteLine($"- {book.Title} by {book.Author}");
-                        }
-                        break;
-
-                    case 5:
-                        Console.WriteLine("Exiting program. Goodbye!");
-                        return;
-
-                    default:
-                        Console.WriteLine("Invalid choice. Please enter a number between 1 and 5.");
-                        break;
-                }
-            }
-            else{
-                Console.WriteLine("Invalid input. Please enter a valid number.");
-            }
-
-            Console.WriteLine("\nPress Enter to continue...");
-            Console.ReadLine();
-        }
-    }
-
-    static void LoadBooksFromCSV(string filePath, Catalog catalog){
-        if (File.Exists(filePath)){
-            using (StreamReader reader = new StreamReader(filePath)){
-                string line;
-                while ((line = reader.ReadLine()) != null){
-                    string[] parts = line.Split(',');
-                    if (parts.Length == 5){
-                        string isbn = parts[0];
-                        string title = parts[1];
-                        string author = parts[2];
-                        string genre = parts[3];
-                        bool isAvailable = bool.Parse(parts[4]);
-                        Book book = new Book(isbn, title, author, genre, isAvailable);
-                        catalog.AddBook(book);
-                    }
-                }
-            }
-        }
-        else{
-            Console.WriteLine($"File not found: {filePath}");
-        }
-    }
-
-}
-
-
-//Code by Nicolas Velasquez
