@@ -4,16 +4,14 @@ using System.IO;
 using System.Linq;
 
 // Book class
-public class Book
-{
+public class Book{
     public string ISBN { get; }
     public string Title { get; }
     public string Author { get; }
     public string Genre { get; }
     public bool IsAvailable { get; set; }
 
-    public Book(string isbn, string title, string author, string genre)
-    {
+    public Book(string isbn, string title, string author, string genre){
         ISBN = isbn;
         Title = title;
         Author = author;
@@ -21,8 +19,7 @@ public class Book
         IsAvailable = true;
     }
 
-    public string GetDetails()
-    {
+    public string GetDetails(){
         return $"ISBN: {ISBN}, Title: {Title}, Author: {Author}, Genre: {Genre}, Available: {(IsAvailable ? "Yes" : "No")}";
     }
 }
@@ -31,110 +28,143 @@ public class Book
 public class Library
 {
     private List<Book> books;
+    private List<Loan> loans; // List to track all loans
 
-    public Library()
-    {
+    public Library(){
         books = new List<Book>();
+        loans = new List<Loan>();
     }
 
-    public void AddBook(Book book)
-    {
+    public void AddBook(Book book){
         books.Add(book);
     }
 
-    public void RemoveBook(Book book)
-    {
+    public void RemoveBook(Book book){
         books.Remove(book);
     }
 
-    public Book SearchBook(string isbn)
-    {
+    public Book SearchBook(string isbn){
         return books.FirstOrDefault(book => book.ISBN == isbn);
     }
 
-    public void ListBooks()
-    {
-        foreach (var book in books)
-        {
+    public void ListBooks(){
+        foreach (var book in books){
             Console.WriteLine(book.GetDetails());
         }
     }
 
-    // Other methods such as checkout, return, etc. can be added here
+    public bool CheckOutBook(Book book, Patron patron, int loanDurationInDays){
+        if (book.IsAvailable){
+            book.IsAvailable = false; // Mark the book as unavailable
+            DateTime dueDate = DateTime.Now.AddDays(loanDurationInDays);
+            Loan loan = new Loan(book, patron, dueDate);
+            loans.Add(loan); // Add the loan to the list of loans
+            patron.AddLoan(loan); // Add the loan to the patron's list of loans
+            return true;
+        }
+        else{
+            return false; // Book is not available for checkout
+        }
+    }    
+
+    public bool ReturnBook(Book book, Patron patron){
+        // Find the loan associated with the book and patron
+        Loan loan = loans.FirstOrDefault(l => l.Book == book && l.Patron == patron);
+        if (loan != null){
+            // Remove the loan from both the library's list of loans and the patron's list of loans
+            loans.Remove(loan);
+            patron.Loans.Remove(loan);
+            // Mark the book as available again
+            book.IsAvailable = true;
+            return true;
+        }
+        else{
+            return false; // Book was not checked out by the patron
+        }
+    }
+
+    public List<Book> GetCheckedOutBooks(){
+        // Get a list of all books that are currently checked out
+        return loans.Where(loan => loan.Book.IsAvailable == false).Select(loan => loan.Book).ToList();
+    }
+
+    public List<Loan> GetOverdueLoans(){
+        // Get a list of all loans that are currently overdue
+        return loans.Where(loan => loan.IsOverdue()).ToList();
+    }    
+
 }
 
 // Patron class
-public class Patron
-{
+public class Patron{
     public string Name { get; }
     public LibraryCard LibraryCard { get; }
+    public List<Loan> Loans { get; } // List to track loans associated with the patron
 
-    public Patron(string name, LibraryCard libraryCard)
-    {
+    public Patron(string name, LibraryCard libraryCard){
         Name = name;
         LibraryCard = libraryCard;
+        Loans = new List<Loan>(); // Initialize the list of loans
     }
 
-    // Additional methods can be added here
+    public void AddLoan(Loan loan){
+        Loans.Add(loan);
+    }
+
 }
 
 // LibraryCard class
-public class LibraryCard
-{
+public class LibraryCard{
     public int CardNumber { get; }
     public Patron Patron { get; }
 
-    public LibraryCard(int cardNumber, Patron patron)
-    {
+    public LibraryCard(int cardNumber, Patron patron){
         CardNumber = cardNumber;
         Patron = patron;
     }
 }
 
 // Loan class
-public class Loan
-{
+public class Loan{
     public Book Book { get; }
     public Patron Patron { get; }
     public DateTime DueDate { get; }
 
-    public Loan(Book book, Patron patron, DateTime dueDate)
-    {
+    public Loan(Book book, Patron patron, DateTime dueDate){
         Book = book;
         Patron = patron;
         DueDate = dueDate;
     }
 
-    // Additional methods can be added here
+    public bool IsOverdue(){
+        return DateTime.Now > DueDate;
+    }
 }
 
+
+
+
 // Catalog class
-public class Catalog
-{
+public class Catalog{
     private List<Book> books;
 
-    public Catalog()
-    {
+    public Catalog(){
         books = new List<Book>();
     }
 
-    public void AddBook(Book book)
-    {
+    public void AddBook(Book book){
         books.Add(book);
     }
 
-    public void RemoveBook(Book book)
-    {
+    public void RemoveBook(Book book){
         books.Remove(book);
     }
 
-    public Book SearchBook(string title)
-    {
+    public Book SearchBook(string title){
         return books.FirstOrDefault(book => book.Title == title);
     }
 
-    public void ListBooks()
-    {
+    public void ListBooks(){
         foreach (var book in books)
         {
             Console.WriteLine(book.GetDetails());
@@ -150,13 +180,11 @@ class Program{
         LoadBooksFromFile("books.txt");
 
         bool exit = false;
-        while (!exit)
-        {
+        while (!exit){
             DisplayMenu();
             int choice = GetMenuChoice();
 
-            switch (choice)
-            {
+            switch (choice){
                 case 1:
                     SearchForBook();
                     break;
@@ -170,16 +198,16 @@ class Program{
                     ListAllBooks();
                     break;
                 case 5:
-                    // Implement Check Out a Book functionality
+                    CheckOutBook();
                     break;
                 case 6:
-                    // Implement Return a Book functionality
+                    ReturnBook();
                     break;
                 case 7:
-                    // Implement List Checked Out Books functionality
+                    ListCheckedOutBooks();
                     break;
                 case 8:
-                    // Implement List Overdue Loans functionality
+                    ListOverdueLoans();
                     break;
                 case 9:
                     exit = true;
@@ -192,15 +220,11 @@ class Program{
         }
     }
 
-    static void LoadBooksFromFile(string filename)
-    {
-        try
-        {
-            using (StreamReader sr = new StreamReader(filename))
-            {
+    static void LoadBooksFromFile(string filename){
+        try{
+            using (StreamReader sr = new StreamReader(filename)){
                 string line;
-                while ((line = sr.ReadLine()) != null)
-                {
+                while ((line = sr.ReadLine()) != null){
                     string[] bookInfo = line.Split(',');
                     string isbn = bookInfo[0].Trim();
                     string title = bookInfo[1].Trim();
@@ -213,8 +237,7 @@ class Program{
             }
             Console.WriteLine("Books loaded successfully.");
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex){
             Console.WriteLine($"Error loading books from file: {ex.Message}");
         }
     }
@@ -231,35 +254,30 @@ class Program{
         Console.WriteLine("8. List Overdue Loans");
         Console.WriteLine("9. Exit");
         Console.Write("\nPlease enter your choice: ");
-        }
+    }
 
-        static int GetMenuChoice(){
+    static int GetMenuChoice(){
         int choice;
-        while (!int.TryParse(Console.ReadLine(), out choice))
-        {
+        while (!int.TryParse(Console.ReadLine(), out choice)){
             Console.Write("Invalid input. Please enter a number: ");
         }
         return choice;
-        }
+    }
 
-        static void SearchForBook()
-        {
+    static void SearchForBook(){
         Console.Write("Enter ISBN of the book to search: ");
         string isbn = Console.ReadLine();
         Book foundBook = library.SearchBook(isbn);
-        if (foundBook != null)
-        {
+        if (foundBook != null){
             Console.WriteLine("Book found:");
             Console.WriteLine(foundBook.GetDetails());
         }
-        else
-        {
+        else{
             Console.WriteLine("Book not found.");
         }
-        }
+    }
 
-        static void AddBook()
-        {
+    static void AddBook(){
         Console.WriteLine("Enter book details:");
         Console.Write("ISBN: ");
         string isbn = Console.ReadLine();
@@ -273,36 +291,100 @@ class Program{
         Book newBook = new Book(isbn, title, author, genre);
         library.AddBook(newBook);
         Console.WriteLine("Book added successfully.");
-        }
+    }
 
-        static void RemoveBook()
-        {
+    static void RemoveBook(){
         Console.Write("Enter ISBN of the book to remove: ");
         string isbn = Console.ReadLine();
         Book foundBook = library.SearchBook(isbn);
-        if (foundBook != null)
-        {
+        if (foundBook != null){
             library.RemoveBook(foundBook);
             Console.WriteLine("Book removed successfully.");
         }
-        else
-        {
+        else{
             Console.WriteLine("Book not found.");
         }
-        }
+    }
 
-        static void ListAllBooks()
-        {
+    static void ListAllBooks(){
         Console.WriteLine("Listing all books:");
         library.ListBooks();
-        }
+    }
 
-        static void InitializeLibraryWithSampleData()
-        {
-        // Add sample books to the library for testing
-        Book book1 = new Book("1234567890", "The Great Gatsby", "F. Scott Fitzgerald", "Classic");
-        Book book2 = new Book("0987654321", "To Kill a Mockingbird", "Harper Lee", "Fiction");
-        library.AddBook(book1);
-        library.AddBook(book2);
+
+    static void CheckOutBook(){
+        Console.Write("Enter ISBN of the book to check out: ");
+        string isbn = Console.ReadLine();
+        Book book = library.SearchBook(isbn);
+        if (book != null){
+            Console.Write("Enter patron's name: ");
+            string patronName = Console.ReadLine();
+            Patron patron = GetOrCreatePatron(patronName);
+            if (patron != null){
+                if (library.CheckOutBook(book, patron, 5)) // Assuming a 14-day loan period
+                {
+                    Console.WriteLine($"Book '{book.Title}' checked out successfully by {patron.Name}.");
+                }
+                else{
+                    Console.WriteLine("Book is not available for checkout.");
+                }
+            }
+            else{
+                Console.WriteLine("Failed to retrieve/create patron.");
+            }
         }
+        else{
+            Console.WriteLine("Book not found.");
+        }
+    }
+
+    static void ReturnBook(){
+        Console.Write("Enter ISBN of the book to return: ");
+        string isbn = Console.ReadLine();
+        Book book = library.SearchBook(isbn);
+        if (book != null){
+            Console.Write("Enter patron's name: ");
+            string patronName = Console.ReadLine();
+            Patron patron = GetOrCreatePatron(patronName);
+            if (patron != null){
+                if (library.ReturnBook(book, patron)){
+                    Console.WriteLine($"Book '{book.Title}' returned successfully by {patron.Name}.");
+                }
+                else{
+                    Console.WriteLine($"Book '{book.Title}' was not checked out by {patron.Name}.");
+                }
+            }
+            else{
+                Console.WriteLine("Failed to retrieve/create patron.");
+            }
+        }
+        else{
+            Console.WriteLine("Book not found.");
+        }
+    }   
+
+    static void ListCheckedOutBooks(){
+        List<Book> checkedOutBooks = library.GetCheckedOutBooks();
+        Console.WriteLine("Checked Out Books:");
+        foreach (var book in checkedOutBooks){
+            Console.WriteLine(book.GetDetails());
+        }
+    }
+
+    static void ListOverdueLoans(){
+        List<Loan> overdueLoans = library.GetOverdueLoans();
+        Console.WriteLine("Overdue Loans:");
+        foreach (var loan in overdueLoans){
+            Console.WriteLine($"Book: {loan.Book.Title}, Patron: {loan.Patron.Name}, Due Date: {loan.DueDate}");
+        }
+    }
+
+    static Patron GetOrCreatePatron(string name){
+        // Logic to get or create a patron by name
+        // For simplicity, we'll return a new patron object for each name entered
+        return new Patron(name, new LibraryCard(111, null)); // Using a fictitious library card number
+        //Please when you check out for a book, this would be the patron's name (111)
+    }
+
+
 }
