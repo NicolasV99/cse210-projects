@@ -387,7 +387,7 @@ class Program{
     }
 }
 
-//Code by Nicolas Belasquez©
+//Code by Nicolas Velasquez©
 
 
 /*There is some instructions for use the program:
